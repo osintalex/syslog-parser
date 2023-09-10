@@ -32,7 +32,6 @@ impl SysLogParser {
 
     pub fn parse(self) {
         let mut writer = Writer::from_path(self.csv_file).unwrap();
-        log::info!("hmm: {}", self.log_file);
         if let Ok(lines) = Self::read_lines(self.log_file) {
             for line in lines {
                 let Ok(log_entry) = line else {panic!("Couldn't read logline")};
@@ -43,17 +42,16 @@ impl SysLogParser {
 
     fn extract_malicious_traffic(log_entry: String, writer: &mut Writer<File>) {
         lazy_static! {
-                static ref FIREWALL_ENTRY : Regex = Regex::new(
+        static ref FIREWALL_ENTRY : Regex = Regex::new(
                     r"\[UFW BLOCK\]"
             ).unwrap();
-                // TODO: Add server identifier in from config file
         static ref LOGS_DATA : Regex = Regex::new(
             r"(?<timestamp>.+) srv[0-9]+.+SRC=(?<src_ip>[0-9\.]+).+PROTO=(?<protocol>[A-Z0-9]+).+SPT=(?<src_port>[0-9]+).+DPT=(?<dst_port>[0-9]+)"
             ).unwrap();
                 static ref LOGS_DATA_NO_PORTS : Regex = Regex::new(
                     r"(?<timestamp>.+) srv[0-9]+.+SRC=(?<src_ip>[0-9\.]+).+PROTO=(?<protocol>[A-Z0-9]+)"
             ).unwrap();
-            }
+        }
         let result = FIREWALL_ENTRY.is_match(&log_entry);
         if result {
             log::info!("Found log line with firewall entry, attemtping to parse...");
