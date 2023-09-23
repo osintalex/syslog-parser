@@ -4,7 +4,7 @@ mod parser;
 
 fn main() {
     SimpleLogger::new().init().unwrap();
-    let my_parser = SysLogParser::new("syslog", "traffic.csv");
+    let my_parser = SysLogParser::new("syslog.tmp", "traffic.csv");
     my_parser.parse();
     log::info!("Successfully parsed logfile :-)");
 }
